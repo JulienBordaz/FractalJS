@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Fractal</title>
+
+<!-- Bootstrap -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/index.css" rel="stylesheet">
+
+</head>
+<body>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/jquery-2.2.0.min.js"></script>
+	<script src="js/index.js"></script>
+	<script src="js/pnglib.js"></script>
+	<div class="container-fluid">
+		<h1>Fractal</h1>
+		<div class="row">
+			<div class="col-xs-4">
+				
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="xcenter" class="col-sm-2 control-label">xcenter</label>
+						<div class="col-sm-10">
+							<input type="number" value="-0.5" class="form-control" id="xcenter">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="ycenter" class="col-sm-2 control-label">ycenter</label>
+						<div class="col-sm-10">
+							<input type="number" value="0" class="form-control" id="ycenter">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="zoom" class="col-sm-2 control-label">zoom</label>
+						<div class="col-sm-10">
+							<input type="number" value="1" class="form-control" id="zoom">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button id="update" type="button" class="btn btn-primary">Update</button>
+						</div>
+					</div>
+				</form>				
+				
+			</div>
+			<div class="col-xs-8" id="graph2">
+			</div>
+		</div>
+	</div>
+</body>
+</html>
