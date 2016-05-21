@@ -43,7 +43,7 @@ function update(xlength,ylength,xcenter,ycenter)
 	
 	//console.log( "update2!" );
 	
-	var nlimit = 50;
+	var nlimit = 200;
 	
 	var datas = calculate(xcenter,xlength,ycenter,ylength,nSide,nlimit);
 	
@@ -58,15 +58,15 @@ function update(xlength,ylength,xcenter,ycenter)
 		//Draw the Rectangle
 		if (datas[i][2] == 0)
 		{
-			p.buffer[p.index(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height/2 + (height/ylength)*datas[i][1]))] = p.color(1, 1, 1);
+			p.buffer[p.index(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height-(height/2-height*ycenter/ylength + (height/ylength)*datas[i][1])))] = p.color(1, 1, 1);
 			//console.log(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height/2 + (height/ylength)*datas[i][1]));
 		} else
 		{
-			p.buffer[p.index(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height/2 + (height/ylength)*datas[i][1]))] = p.color(Math.round(254*datas[i][2]/nlimit), 0, 0);
+			p.buffer[p.index(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height-(height/2-height*ycenter/ylength + (height/ylength)*datas[i][1])))] = p.color(Math.round(254*datas[i][2]/nlimit), 0, 0);
 		}
 	}
 	
-	$("#graph2").append('<img src="data:image/png;base64,'+p.getBase64()+'">');
+	$("#graph").append('<img class="fractalPicture" src="data:image/png;base64,'+p.getBase64()+'">');
 }
 
 $( document ).ready(function() {
@@ -74,12 +74,29 @@ $( document ).ready(function() {
 	update(4,4,-0.5,0);
 	$( "#update" ).click(function() {
 		//console.log( "update!" );
-		$("#graph2").empty();
+		$("#graph").empty();
 		var zoom = parseFloat($( "#zoom" ).val().replace(',', '.'));
 		var xlength = 4/zoom;
 		var ylength = 4/zoom;
 		var xcenter = parseFloat($( "#xcenter" ).val().replace(',', '.'));
 		var ycenter = parseFloat($( "#ycenter" ).val().replace(',', '.'));
+		update(xlength,ylength,xcenter,ycenter);
+	});
+	
+	$('#graph').click(function(e) {
+		var pictureSize = 600;
+		var offset = $(this).offset();
+		var pixelX = e.pageX - offset.left;
+		var pixelY = e.pageY - offset.top;
+		var zoom = parseFloat($( "#zoom" ).val().replace(',', '.'));
+		var xcenter = parseFloat($( "#xcenter" ).val().replace(',', '.'))+4*(pixelX-300)/(zoom*600);
+		var ycenter = parseFloat($( "#ycenter" ).val().replace(',', '.'))-4*(pixelY-300)/(zoom*600);
+		$( "#xcenter" ).val(xcenter);
+		$( "#ycenter" ).val(ycenter);
+		var xlength = 4/(2*zoom);
+		var ylength = 4/(2*zoom);
+		$( "#zoom" ).val(2*zoom);
+		$("#graph").empty();
 		update(xlength,ylength,xcenter,ycenter);
 	});
 	
