@@ -1,3 +1,6 @@
+// test if the Mandelbrot formula is diverging at this point
+// return 1 if there is divergence
+// otherwise returns the number of steps needed to reach norm of 4
 function conv(x, y, nmax)
 {
 	// trivial tests
@@ -5,6 +8,7 @@ function conv(x, y, nmax)
 	if (x*x + y*y < 0.0625) return 0;
 	if ((x+1)*(x+1) + y*y < 0.0625) return 0;
 	
+	// regular divergence testing
 	var xtemp=0, ytemp=0, xtemp2=0;
 	for (var j=0; j < nmax;j++)
 	{
@@ -17,6 +21,7 @@ function conv(x, y, nmax)
      
 }
 
+// calculate the picture for a given position, sizes and step limit
 function calculate(xmil, xsize, ymil, ysize, squares, nlimit)
 {
 	result = [];
@@ -36,8 +41,8 @@ function calculate(xmil, xsize, ymil, ysize, squares, nlimit)
 
 function update(xlength,ylength,xcenter,ycenter)
 {
-	var width = 600;
-	var height = 600;
+	var width = 500;
+	var height = 500;
 	
 	var nSide = width/1;
 	
@@ -49,7 +54,7 @@ function update(xlength,ylength,xcenter,ycenter)
 	
 	//console.log(datas);
 	
-	var p = new PNGlib(600, 600, 256); // construcor takes height, weight and color-depth
+	var p = new PNGlib(500, 500, 256); // construcor takes height, weight and color-depth
 	var background = p.color(0, 0, 0, 0); // set the background transparent
 
 	for (var i=0;i<datas.length; i++)
@@ -71,7 +76,11 @@ function update(xlength,ylength,xcenter,ycenter)
 
 $( document ).ready(function() {
 	console.log( "ready!" );
+	
+	// default initialization of the picture
 	update(4,4,-0.5,0);
+	
+	// update by clicking on the button
 	$( "#update" ).click(function() {
 		//console.log( "update!" );
 		$("#graph").empty();
@@ -83,18 +92,22 @@ $( document ).ready(function() {
 		update(xlength,ylength,xcenter,ycenter);
 	});
 	
+	// update by clicking on the picture
 	$('#graph').click(function(e) {
-		var pictureSize = 600;
 		var offset = $(this).offset();
 		var pixelX = e.pageX - offset.left;
 		var pixelY = e.pageY - offset.top;
 		var zoom = parseFloat($( "#zoom" ).val().replace(',', '.'));
-		var xcenter = parseFloat($( "#xcenter" ).val().replace(',', '.'))+4*(pixelX-300)/(zoom*600);
-		var ycenter = parseFloat($( "#ycenter" ).val().replace(',', '.'))-4*(pixelY-300)/(zoom*600);
-		$( "#xcenter" ).val(xcenter);
-		$( "#ycenter" ).val(ycenter);
+		var xcenterTemp = parseFloat($( "#xcenter" ).val().replace(',', '.'))+4*(pixelX-250)/(zoom*500);
+		var ycenterTemp = parseFloat($( "#ycenter" ).val().replace(',', '.'))-4*(pixelY-250)/(zoom*500);
 		var xlength = 4/(2*zoom);
 		var ylength = 4/(2*zoom);
+		var roundFactor = 100*Math.pow(10, Math.floor(Math.log(10*zoom)));
+		console.log(roundFactor);
+		var xcenter = Math.floor(roundFactor*xcenterTemp)/roundFactor;
+		var ycenter = Math.floor(roundFactor*ycenterTemp)/roundFactor;
+		$( "#xcenter" ).val(xcenter);
+		$( "#ycenter" ).val(ycenter);
 		$( "#zoom" ).val(2*zoom);
 		$("#graph").empty();
 		update(xlength,ylength,xcenter,ycenter);
