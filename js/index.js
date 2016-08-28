@@ -10,15 +10,16 @@ function conv(x, y, nmax)
 	
 	// regular divergence testing
 	var xtemp=0, ytemp=0, xtemp2=0;
+	var coef = 1e20;
 	for (var j=0; j < nmax;j++)
 	{
-		xtemp2 = xtemp*xtemp - ytemp*ytemp +x;
-		ytemp = 2*xtemp*ytemp +y;
+		xtemp2 = (coef*(xtemp*coef)*(xtemp*coef)/(coef*coef) - coef*(ytemp*coef)*(ytemp*coef)/(coef*coef) +coef*x)/coef;
+		ytemp = (coef*2*(xtemp*coef)*(ytemp*coef)/(coef*coef) +coef*y)/coef;
 		xtemp = xtemp2;
 		if (xtemp*xtemp+ytemp*ytemp>4) return j;
 	}
-	return 0;
-     
+	
+	return 0;     
 }
 
 // calculate the picture for a given position, sizes and step limit
@@ -27,12 +28,19 @@ function calculate(xmil, xsize, ymil, ysize, squares, nlimit)
 	result = [];
     var k=0;
 	var l=0;
-	for (var i=ymil+ysize/2;i>=ymil-ysize/2; i=i-ysize/squares)
+	var coef = 1e20;
+	var n = 0;
+	console.clear();
+	for (var i=0;i<500;i++)
 	{
-		for (var j=xmil-xsize/2;j<=xmil+xsize/2; j=j+xsize/squares)
+		
+		n++;
+		for (var j=0;j<500;j++)
 		{
-			var limit = conv(j,i,nlimit);
-			result.push([j,i,limit]);
+			var y=(((ymil*coef)+(ysize*coef)/2)-i*(ysize*coef)/squares)/coef;
+			var x=(((coef*xmil)-(xsize*coef)/2)+j*(xsize*coef)/squares)/coef;
+			var limit = conv(x,y,nlimit);
+			result.push([x,y,limit]);
 		}
 		l++;   
 	}
@@ -46,32 +54,50 @@ function update(xlength,ylength,xcenter,ycenter)
 	
 	var nSide = width/1;
 	
-	//console.log( "update2!" );
-	
-	var nlimit = 200;
+	var nlimit = $( "#limit" ).val();
 	
 	var datas = calculate(xcenter,xlength,ycenter,ylength,nSide,nlimit);
 	
-	//console.log(datas);
+	// Get the canvas and context
+    var canvas = document.getElementById("viewport"); 
+    var context = canvas.getContext("2d");
+ 
+    // Define the image dimensions
+    var width = canvas.width;
+    var height = canvas.height;
+ 
+    // Create an ImageData object
+    var imagedata = context.createImageData(width, height);
 	
-	var p = new PNGlib(500, 500, 256); // construcor takes height, weight and color-depth
-	var background = p.color(0, 0, 0, 0); // set the background transparent
-
 	for (var i=0;i<datas.length; i++)
 	{
-		//console.log("pouet");
-		//Draw the Rectangle
+		var pixelindex = i * 4;
+ 
+		// Generate a xor pattern with some random noise
+		var red;
+		var green;
+		var blue;
+
 		if (datas[i][2] == 0)
 		{
-			p.buffer[p.index(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height-(height/2-height*ycenter/ylength + (height/ylength)*datas[i][1])))] = p.color(1, 1, 1);
-			//console.log(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height/2 + (height/ylength)*datas[i][1]));
+			red = 1;
+			green = 1;
+			blue = 1;
 		} else
 		{
-			p.buffer[p.index(Math.round(width/2-width*xcenter/xlength + (width/xlength)*datas[i][0]), Math.round(height-(height/2-height*ycenter/ylength + (height/ylength)*datas[i][1])))] = p.color(Math.round(254*datas[i][2]/nlimit), 0, 0);
+			red = Math.round(254*datas[i][2]/nlimit);
+			green = 0;
+			blue = 0;
 		}
+
+		// Set the pixel data
+		imagedata.data[pixelindex] = red;     // Red
+		imagedata.data[pixelindex+1] = green; // Green
+		imagedata.data[pixelindex+2] = blue;  // Blue
+		imagedata.data[pixelindex+3] = 255;   // Alpha
 	}
 	
-	$("#graph").append('<img class="fractalPicture" src="data:image/png;base64,'+p.getBase64()+'">');
+	context.putImageData(imagedata, 0, 0);
 }
 
 $( document ).ready(function() {
@@ -83,7 +109,7 @@ $( document ).ready(function() {
 	// update by clicking on the button
 	$( "#update" ).click(function() {
 		//console.log( "update!" );
-		$("#graph").empty();
+		//$("#graph").empty();
 		var zoom = parseFloat($( "#zoom" ).val().replace(',', '.'));
 		var xlength = 4/zoom;
 		var ylength = 4/zoom;
@@ -93,7 +119,7 @@ $( document ).ready(function() {
 	});
 	
 	// update by clicking on the picture
-	$('#graph').click(function(e) {
+	$('#viewport').click(function(e) {
 		var offset = $(this).offset();
 		var pixelX = e.pageX - offset.left;
 		var pixelY = e.pageY - offset.top;
@@ -103,7 +129,6 @@ $( document ).ready(function() {
 		var xlength = 4/(2*zoom);
 		var ylength = 4/(2*zoom);
 		var roundFactor = 100*Math.pow(10, Math.floor(Math.log(10*zoom)));
-		console.log(roundFactor);
 		var xcenter = Math.floor(roundFactor*xcenterTemp)/roundFactor;
 		var ycenter = Math.floor(roundFactor*ycenterTemp)/roundFactor;
 		$( "#xcenter" ).val(xcenter);
@@ -113,5 +138,15 @@ $( document ).ready(function() {
 		update(xlength,ylength,xcenter,ycenter);
 	});
 	
-	
+	// reset
+	$('#reset').click(function(e) {
+		var zoom = 0.5;
+		var xcenter = -0.5;
+		var ycenter = 0;
+		$( "#xcenter" ).val(xcenter);
+		$( "#ycenter" ).val(ycenter);
+		$( "#zoom" ).val(2*zoom);
+		//$("#graph").empty();
+		update(4,4,-0.5,0);
+	});
 });
