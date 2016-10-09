@@ -21,31 +21,48 @@
 	<script src="js/jquery-2.2.0.min.js"></script>
 	<script src="js/index.js"></script>
 	<div class="container-fluid">
-		<h1>Fractal</h1>
+		<h1 class="bg-primary text-center">Online Fractal Generator</h1>
+		<div class="row jumbotron">
+			<div class="col-xs-12 col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
+				The purpose of this code to generate and explore Mandelbrot or Julia fractals easily, without downloading any software or using any third-party plugin. Only HTML5/JavaScript.
+				<br/>Due to inherent limitations of JavaScript, expect the generation to become time consuming as you zoom in. To access really high zooms or use advanced features, you might consider using a traditional offline fractal generation software.
+			</div>
+		</div>
 		<div class="row">
-			<div class="col-xs-12">
+			<div class="col-xs-12 text-center">
+				<button type="button" id="MandelbrotButton" class="btn btn-primary">Mandelbrot</button>
+				<button type="button" id="JuliaButton" class="btn btn-success">Julia</button>
+				<button type="button" id="AboutButton" class="btn btn-info">About</button>
+			</div>
+		</div>
+		<!-- Fractal de Mandelbrot -->
+		<div class="row m-t-15" id="rowMandelbrot">
+			<div class="col-xs-12 text-center">
+				<canvas class="fractalPicture" id="viewport" width="500" height="500"></canvas>
+			</div>
+			<div class="col-xs-12 col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
 				<form class="form-horizontal">
 					<div class="form-group">
-						<label for="xcenter" class="col-sm-2 control-label">xcenter</label>
-						<div class="col-sm-10">
+						<label for="xcenter" class="col-xs-2 control-label">xcenter</label>
+						<div class="col-xs-10 col-sm-6">
 							<input type="number" value="-0.5" class="form-control" id="xcenter">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="ycenter" class="col-sm-2 control-label">ycenter</label>
-						<div class="col-sm-10">
+						<label for="ycenter" class="col-xs-2 control-label">ycenter</label>
+						<div class="col-xs-10 col-sm-6">
 							<input type="number" value="0" class="form-control" id="ycenter">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="zoom" class="col-sm-2 control-label">zoom</label>
-						<div class="col-sm-10">
+						<label for="zoom" class="col-xs-2 control-label">zoom</label>
+						<div class="col-xs-10 col-sm-6">
 							<input type="number" value="1" class="form-control" id="zoom">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="limit" class="col-sm-2 control-label">Iteration limit</label>
-						<div class="col-sm-10">
+						<label for="limit" class="col-xs-2 control-label">Iteration limit</label>
+						<div class="col-xs-10 col-sm-6">
 							<input type="number" value="200" class="form-control" id="limit">
 						</div>
 					</div>
@@ -60,9 +77,64 @@
 				</form>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-xs-12">
-				<canvas class="fractalPicture" id="viewport" width="500" height="500"></canvas>
+		<!-- Fractal de Julia -->
+		<div class="row m-t-15" id="rowJulia" hidden="true">
+			<div class="col-xs-12 text-center">
+				<canvas class="fractalPicture" id="viewportJulia" width="500" height="500"></canvas>
+			</div>
+			<div class="col-xs-12 col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="xcenterJulia" class="col-xs-2 control-label">xcenter</label>
+						<div class="col-xs-10 col-sm-6">
+							<input type="number" value="0" class="form-control" id="xcenterJulia">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="ycenterJulia" class="col-xs-2 control-label">ycenter</label>
+						<div class="col-xs-10 col-sm-6">
+							<input type="number" value="0" class="form-control" id="ycenterJulia">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="xJulia" class="col-xs-2 control-label">xJulia</label>
+						<div class="col-xs-10 col-sm-6">
+							<input type="number" value="0.3" class="form-control" id="xJulia">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="yJulia" class="col-xs-2 control-label">yJulia</label>
+						<div class="col-xs-10 col-sm-6">
+							<input type="number" value="0.5" class="form-control" id="yJulia">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="zoomJulia" class="col-xs-2 control-label">zoom</label>
+						<div class="col-xs-10 col-sm-6">
+							<input type="number" value="1" class="form-control" id="zoomJulia">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="limitJulia" class="col-xs-2 control-label">Iteration limit</label>
+						<div class="col-xs-10 col-sm-6">
+							<input type="number" value="200" class="form-control" id="limitJulia">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-5">
+							<button id="updateJulia" type="button" class="btn btn-primary">Update</button>
+						</div>
+						<div class="col-sm-5">
+							<button id="resetJulia" type="button" class="btn btn-primary">Reset</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!-- Fractal de Julia -->
+		<div class="row m-t-15" id="rowAbout" hidden="true">
+			<div class="col-xs-12 text-center">
+				About page
 			</div>
 		</div>
 	</div>
